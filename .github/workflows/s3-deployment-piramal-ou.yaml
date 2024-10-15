@@ -11,10 +11,16 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: '20'
+      
       - name: npm install, build
         run: |
           ls -ltra
-          npm cache clean --force
+          if [ -f .env ]; then
+          rm .env
+          fi
+          echo '${{ secrets.DEV_ENV }}' > .env
+          ls -ltra
+          #npm cache clean --force
           npm install --legacy-peer-deps
           npm run build --prod --aot --output-hashing=all
           ls -ltra

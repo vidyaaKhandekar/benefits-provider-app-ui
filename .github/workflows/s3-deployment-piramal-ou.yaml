@@ -33,13 +33,12 @@ jobs:
       - name: List Contents
         run: |
            echo "Contents of the current directory (in reverse order):"
-            cd osw/
             ls -lr
 
       - name: List Contents
         run: |
            echo "Contents of the dist directory (in reverse order):"
-            cd /home/runner/work/osw-frontend/osw-frontend/osw/
+            cd 
             ls -lr
             
 

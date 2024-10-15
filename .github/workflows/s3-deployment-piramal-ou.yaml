@@ -20,7 +20,7 @@ jobs:
           fi
           echo '${{ secrets.DEV_ENV }}' > .env
           ls -ltra
-          npm install
+          npm install --force
           npm run build --prod --aot --output-hashing=all
           ls -ltra
       - name: Show PWD

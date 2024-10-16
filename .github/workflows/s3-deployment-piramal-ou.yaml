@@ -20,7 +20,7 @@ jobs:
           fi
           echo '${{ secrets.DEV_ENV }}' > .env
           ls -ltra
-          yarn intall
+          yarn install
           yarn build
           ls -ltra
       - name: Show PWD

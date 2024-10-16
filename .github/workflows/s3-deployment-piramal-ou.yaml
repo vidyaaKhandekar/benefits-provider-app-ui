@@ -20,10 +20,8 @@ jobs:
           fi
           echo '${{ secrets.DEV_ENV }}' > .env
           ls -ltra
-          npm install @chakra-ui/react@latest @chakra-ui/icons@latest
-          npm install --force
-          npm install --legacy-peer-deps
-          npm run build
+          yarn intall
+          yarn build
           ls -ltra
       - name: Show PWD
         run: |

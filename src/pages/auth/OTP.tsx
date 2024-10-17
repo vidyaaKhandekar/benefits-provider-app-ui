@@ -2,116 +2,132 @@ import {
   Button,
   FormControl,
   HStack,
-  Image,
-  Input,
   Stack,
   VStack,
+  PinInput,
+  PinInputField,
+  Text,
 } from "@chakra-ui/react";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
-import Logo from "../../assets/Images/GOM.png";
-import TH3 from "../../components/common/typography/TH3";
-import TT2 from "../../components/common/typography/TT2";
-import TT3 from "../../components/common/typography/TT3";
+import { useNavigate, useLocation } from "react-router-dom";
+
 import Layout from "../../components/layout/Layout";
+import LeftSideBar from "../../components/common/login/LeftSideBar";
+import { sendOTP, userRegister } from "../../services/auth";
+import Loading from "../../components/common_components/Loading";
+
 export default function OTP() {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const [otp, setOtp] = React.useState(Array(6).fill(""));
-
+  const location = useLocation();
+  const [otp, setOtp] = React.useState();
+  const [isSubmitDisabled, setIsSubmitDisabled] = React.useState(true);
+  const [timer, setTimer] = React.useState(300); // 5 minutes countdown (300 seconds)
+  const otpArray = Array(6).fill("");
+  const [isLoading, setIsLoading] = React.useState(false);
+  const fromPage = location?.state?.fromPage || "login";
   // Handle OTP input change
-  const handleChange = (element: any, index: number) => {
-    const value = element.target.value;
-    if (!/^\d$/.test(value) && value !== "") return; // Only allow numbers
-    const newOtp = [...otp];
-    newOtp[index] = value;
-    setOtp(newOtp);
-
-    // Automatically focus on the next input box if value is entered
-    if (value && element.target.nextSibling) {
-      element.target.nextSibling.focus();
-    }
+  const handleChange = (element: any) => {
+    setOtp(element);
+    setIsSubmitDisabled(element.length !== 6);
   };
 
-  // Handle backspace
-  const handleBackspace = (
-    index: number,
-    event: React.KeyboardEvent<HTMLInputElement>
-  ) => {
-    if (event.key === "Backspace" && index > 0 && otp[index] === "") {
-      const previousSibling = (event.target as HTMLInputElement)
-        .previousElementSibling as HTMLInputElement | null;
-      if (previousSibling) {
-        previousSibling.focus();
+  // Countdown timer effect
+  React.useEffect(() => {
+    if (timer > 0) {
+      const countdown = setInterval(() => {
+        setTimer((prev) => prev - 1);
+      }, 1000);
+      return () => clearInterval(countdown);
+    }
+  }, [timer]);
+
+  // Format time as MM:SS
+  const formatTime = (seconds: number) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds < 10 ? "0" : ""}${remainingSeconds}`;
+  };
+  const handleOtp = async () => {
+    setIsLoading(true);
+    const otpNumber = Number(otp);
+    const email = localStorage.getItem("Email");
+    if (fromPage == "registration" && email) {
+      const registerResponse = await userRegister(otpNumber, email);
+      setIsLoading(false);
+      if (registerResponse?.jwt) {
+        localStorage.setItem("token", "true");
+        localStorage.setItem("user", JSON.stringify(registerResponse?.user));
+        navigate("/");
+        window.location.reload();
+      }
+    } else if (fromPage == "login" && email) {
+      const otpLoginResponse = await sendOTP(otpNumber, email);
+      setIsLoading(false);
+      if (otpLoginResponse?.jwt) {
+        localStorage.setItem("token", "true");
+        localStorage.setItem("user", JSON.stringify(otpLoginResponse?.user));
+        navigate("/");
+        window.location.reload();
       }
     }
   };
   return (
     <Layout showMenu={false} showSearchBar={false} showLanguage={true}>
-      <HStack w="full" h="2xl" spacing={8} align="stretch">
-        <VStack
-          flex={1}
-          backgroundColor={"#121943"}
-          align={"center"}
-          justify={"center"}
-        >
-          <HStack>
-            <Image src={Logo} />
-            <VStack align={"start"}>
-              <TH3 color={"white"} textAlign="left">
-                {t("HEADER_COMPANY_NAME")}
-              </TH3>
-              <TT2 color={"white"} textAlign="left">
-                {t("LOGIN_RIGHT_TEXT_H2")}
-              </TT2>
-              <TT2 color={"white"} textAlign="left">
-                {t("LOGIN_RIGHT_TEXT_H3")}
-              </TT2>
-            </VStack>
-          </HStack>
-        </VStack>
-        <VStack p={8} flex={1} align={"center"} justify={"center"}>
-          <Stack spacing={4} w={"full"} maxW={"md"}>
-            <TH3>{t("OTP_LOGIN")}</TH3>
-            <TT2>{t("OTP_WELCOME")}</TT2>
-            <FormControl id="email">
-              <TT2>{t("OTP_ENTER_OTP")}</TT2>
+      {isLoading ? (
+        <Loading />
+      ) : (
+        <HStack w="full" h="lg" spacing={8} align="stretch">
+          <LeftSideBar />
+          <VStack p={8} flex={1} align={"center"} justify={"center"}>
+            <Stack spacing={4} w={"full"}>
+              <Text fontSize={"24px"} fontWeight={400}>
+                {t("OTP_LOGIN")}
+              </Text>
+              <Text fontSize={"16px"} fontWeight={400}>
+                {t("OTP_WELCOME")}
+              </Text>
+              <FormControl id="email">
+                <Text fontSize={"16px"} fontWeight={400}>
+                  {t("OTP_ENTER_OTP")}
+                </Text>
 
-              <HStack spacing={2}>
-                {otp.map((data, index) => (
-                  <Input
-                    key={data + index}
-                    type="text"
-                    maxLength={1} // Limit input to 1 character
-                    value={data}
-                    onChange={(e) => handleChange(e, index)}
-                    onFocus={(e) => e.target.select()} // Select input on focus
-                    onKeyDown={(e) => handleBackspace(index, e)}
-                    textAlign="center" // Center align the text
-                    size="lg" // Larger input size
-                    width="3rem" // Custom width for OTP boxes
-                  />
-                ))}
-              </HStack>
-            </FormControl>
-            <Stack spacing={6}>
-              <TT2>{t("OTP_RESEND")}</TT2>
-              <Button
-                colorScheme={"blue"}
-                variant={"solid"}
-                borderRadius={"100px"}
-                onClick={() => {
-                  localStorage.setItem("token", "true");
-                  navigate(0);
-                }}
-              >
-                <TT3>{t("LOGIN_LOGIN")}</TT3>
-              </Button>
+                <HStack>
+                  <PinInput
+                    size="lg"
+                    value={otp}
+                    onChange={(e) => handleChange(e)}
+                    otp
+                  >
+                    {otpArray?.map((feild) => {
+                      return <PinInputField key={feild} type="text" />;
+                    })}
+                  </PinInput>
+                </HStack>
+              </FormControl>
+              <Stack spacing={6}>
+                <Text fontSize={"16px"} fontWeight={400}>
+                  {t("OTP_RESEND")}
+                  {formatTime(timer)}
+                </Text>
+
+                <Button
+                  colorScheme={"blue"}
+                  variant={"solid"}
+                  borderRadius={"100px"}
+                  isDisabled={isSubmitDisabled}
+                  onClick={() => handleOtp()}
+                >
+                  <Text fontSize={"14px"} fontWeight={400}>
+                    {t("OTP_SUBMIT")}
+                  </Text>
+                </Button>
+              </Stack>
             </Stack>
-          </Stack>
-        </VStack>
-      </HStack>
+          </VStack>
+        </HStack>
+      )}
     </Layout>
   );
 }

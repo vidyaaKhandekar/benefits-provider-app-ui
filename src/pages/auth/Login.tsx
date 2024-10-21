@@ -7,6 +7,7 @@ import {
   Stack,
   Text,
   VStack,
+  Tooltip,
 } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, Link } from "react-router-dom";
@@ -16,6 +17,7 @@ import React from "react";
 import { LoginProvider } from "../../services/auth";
 import Loading from "../../components/common_components/Loading";
 import ModalShow from "../../components/common/modal/ModalShow";
+import AlertMessage from "../../components/common/modal/AlertMessage";
 export default function Login() {
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -23,16 +25,32 @@ export default function Login() {
   const [email, setEmail] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(false);
   const [open, setOpen] = React.useState(false);
+  const [showAlert, setShowAlert] = React.useState(false);
+  const [message, setMessage] = React.useState("");
+
   const handleLogin = async () => {
     setIsLoading(true);
     localStorage.setItem("Email", email);
-    const loginResponse = await LoginProvider(email);
-    if (loginResponse) {
+    try {
+      const loginResponse = await LoginProvider(email);
+      if (loginResponse) {
+        setIsLoading(false);
+        navigate("/otp", { state: { fromPage: "login" } });
+      } else {
+        setIsLoading(false);
+        setMessage("Please contact admin!");
+        setShowAlert(true);
+      }
+    } catch (err) {
       setIsLoading(false);
-      navigate("/otp", { state: { fromPage: "login" } });
+      setMessage(err as string);
+      setShowAlert(true);
     }
   };
 
+  const handleCloseAlertModal = () => {
+    setShowAlert(false);
+  };
   const handleCloseModal = () => {
     setOpen(false);
     setIsChecked(true);
@@ -42,15 +60,29 @@ export default function Login() {
       {isLoading ? (
         <Loading />
       ) : (
-        <HStack w="full" h="lg" spacing={8} align="stretch">
+        <HStack w="full" h="89vh" spacing={8} align="stretch" overflow="hidden">
           <LeftSideBar />
 
-          <VStack p={8} flex={1} align={"center"} justify={"center"} w={"full"}>
+          <VStack
+            p={8}
+            spacing={4}
+            flex={1}
+            align={"center"}
+            justify={"center"}
+            w={"full"}
+            h={"full"} // Ensure full height is used
+            overflow="hidden"
+          >
             <Stack spacing={4} w={"full"}>
-              <Text fontSize={"24px"} fontWeight={400} textAlign={"left"}>
+              <Text
+                fontSize={"24px"}
+                fontWeight={400}
+                textAlign={"left"}
+                marginBottom={"14px"}
+              >
                 {t("LOGIN_TITLE")}
               </Text>
-              <FormControl id="email">
+              <FormControl id="email" mt={60}>
                 <Text fontSize={"16px"} fontWeight={400}>
                   {t("LOGIN_ENAIL_ID")}
                 </Text>
@@ -60,6 +92,8 @@ export default function Login() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   isRequired
+                  marginTop={"14px"}
+                  placeholder="Organisation Email"
                 />
               </FormControl>
 
@@ -68,8 +102,9 @@ export default function Login() {
                   direction={{ base: "column", sm: "column" }}
                   align={"start"}
                   justify={"space-between"}
+                  mt={6}
                 >
-                  <HStack>
+                  <HStack marginBottom={"14px"}>
                     <Text fontSize={"16px"} fontWeight={400}>
                       {t("LOGIN_TERMS_ACCEPT")}
                     </Text>
@@ -91,17 +126,29 @@ export default function Login() {
                       {t("LOGIN_TERMS_ACCEPT_PROCEED")}
                     </Text>
                   </HStack>
-                  <Checkbox isChecked={isChecked}>
-                    <Text fontSize={"16px"} fontWeight={400}>
-                      {t("LOGIN_AGREE")}
-                    </Text>
-                  </Checkbox>
+                  <HStack marginLeft={"24px"}>
+                    <Tooltip
+                      label="Please click on Terms and Condition Link"
+                      placement="top"
+                    >
+                      <Checkbox isChecked={isChecked}>
+                        <Text
+                          fontSize={"16px"}
+                          fontWeight={400}
+                          //
+                          // marginLeft={"24px"}
+                        >
+                          {t("LOGIN_AGREE")}
+                        </Text>
+                      </Checkbox>
+                    </Tooltip>
+                  </HStack>
                 </Stack>
                 <Button
                   colorScheme={"blue"}
                   variant={"solid"}
                   borderRadius={"100px"}
-                  isDisabled={!isChecked}
+                  isDisabled={!isChecked || email === ""}
                   onClick={handleLogin}
                 >
                   <Text fontSize={"14px"} fontWeight={400}>
@@ -128,6 +175,13 @@ export default function Login() {
       )}
 
       {open && <ModalShow show={open} close={handleCloseModal} />}
+      {showAlert && (
+        <AlertMessage
+          message={message}
+          show={showAlert}
+          close={handleCloseAlertModal}
+        />
+      )}
     </Layout>
   );
 }

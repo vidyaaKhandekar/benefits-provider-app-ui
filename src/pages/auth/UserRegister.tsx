@@ -7,6 +7,7 @@ import {
   Input,
   Stack,
   Text,
+  Tooltip,
   VStack,
 } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
@@ -16,6 +17,7 @@ import LeftSideBar from "../../components/common/login/LeftSideBar";
 import { registerProvider } from "../../services/auth";
 import Loading from "../../components/common_components/Loading";
 import ModalShow from "../../components/common/modal/ModalShow";
+import AlertMessage from "../../components/common/modal/AlertMessage";
 export default function UserRegister() {
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -24,15 +26,29 @@ export default function UserRegister() {
   const [email, setEmail] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(false);
   const [open, setOpen] = React.useState(false);
-
+  const [showAlert, setShowAlert] = React.useState(false);
+  const [message, setMessage] = React.useState("");
   const handleRegister = async () => {
     localStorage.setItem("Email", email);
     setIsLoading(true);
-    const registerResponse = await registerProvider(name, email);
-    setIsLoading(false);
-    if (registerResponse) {
-      navigate("/otp", { state: { fromPage: "registration" } });
+    try {
+      const registerResponse = await registerProvider(name, email);
+      setIsLoading(false);
+      if (registerResponse) {
+        navigate("/otp", { state: { fromPage: "registration" } });
+      } else {
+        setIsLoading(false);
+        setMessage("Please contact admin!");
+        setShowAlert(true);
+      }
+    } catch (err) {
+      setIsLoading(false);
+      setMessage(err as string);
+      setShowAlert(true);
     }
+  };
+  const handleCloseAlertModal = () => {
+    setShowAlert(false);
   };
   const handleCloseModal = () => {
     setOpen(false);
@@ -44,31 +60,35 @@ export default function UserRegister() {
       {isLoading ? (
         <Loading />
       ) : (
-        <HStack w="full" h="lg" spacing={8} align="stretch">
+        <HStack w="full" h="89vh" spacing={8} align="stretch">
           <LeftSideBar />
           <VStack p={8} flex={1} align={"center"} justify={"center"} w={"full"}>
-            <Stack spacing={4} w={"full"}>
-              <Text fontSize={"24px"} fontWeight={400}>
+            <Stack spacing={6} w={"full"}>
+              <Text fontSize={"24px"} fontWeight={400} marginBottom={"14px"}>
                 {t("LOGIN_REGISTER_TITLE")}
               </Text>
               <FormControl id="email">
-                <Text fontSize={"16px"} fontWeight={400}>
+                <Text fontSize={"16px"} fontWeight={400} marginBottom={"12px"}>
                   {t("REGISTER_ORGANISATION_NAME")}
                 </Text>
                 <Input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
+                  placeholder="Organisation Name"
                   isRequired
+                  marginBottom={"12px"}
                 />
-                <Text fontSize={"16px"} fontWeight={400}>
+                <Text fontSize={"16px"} fontWeight={400} marginBottom={"12px"}>
                   {t("LOGIN_ENAIL_ID")}
                 </Text>
                 <Input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Organisation Email"
                   isRequired
+                  marginBottom={"12px"}
                 />
               </FormControl>
 
@@ -78,7 +98,7 @@ export default function UserRegister() {
                   align={"start"}
                   justify={"space-between"}
                 >
-                  <HStack>
+                  <HStack marginBottom={"22px"}>
                     <Text fontSize={"16px"} fontWeight={400}>
                       {t("LOGIN_TERMS_ACCEPT")}
                     </Text>
@@ -100,17 +120,22 @@ export default function UserRegister() {
                       {t("LOGIN_TERMS_ACCEPT_PROCEED")}
                     </Text>
                   </HStack>
-                  <Checkbox isChecked={isChecked}>
-                    <Text fontSize={"16px"} fontWeight={400}>
-                      {t("LOGIN_AGREE")}
-                    </Text>
-                  </Checkbox>
+                  <Tooltip
+                    label="Please click on Terms and Condition Link"
+                    placement="top"
+                  >
+                    <Checkbox isChecked={isChecked}>
+                      <Text fontSize={"16px"} fontWeight={400}>
+                        {t("LOGIN_AGREE")}
+                      </Text>
+                    </Checkbox>
+                  </Tooltip>
                 </Stack>
                 <Button
                   colorScheme={"blue"}
                   variant={"solid"}
                   borderRadius={"100px"}
-                  isDisabled={!isChecked}
+                  isDisabled={!isChecked || !email || !name}
                   onClick={() => handleRegister()}
                 >
                   {/* {
@@ -128,6 +153,13 @@ export default function UserRegister() {
         </HStack>
       )}
       {open && <ModalShow show={open} close={handleCloseModal} />}
+      {showAlert && (
+        <AlertMessage
+          message={message}
+          show={showAlert}
+          close={handleCloseAlertModal}
+        />
+      )}
     </Layout>
   );
 }

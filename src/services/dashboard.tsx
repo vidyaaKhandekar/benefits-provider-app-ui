@@ -16,10 +16,10 @@ export const applicationOverviewDigit1 = async () => {
 };
 
 export const applicationOverviewDigit = async () => {
-  let data = JSON.stringify({});
+  const data = JSON.stringify({});
   const config: AxiosRequestConfig = {
     method: "post",
-    url: `${apiDigitUrl}/_appstat`, // Local proxy path
+    url: "/application/v1/_appstat", // Local proxy path
     headers: {
       "Content-Type": "application/json",
     },
@@ -35,45 +35,63 @@ export const applicationOverviewDigit = async () => {
   }
 };
 // Financial overview digit API
-
 export const financialOverviewDigit = async () => {
-  const payload = {};
+  const data = JSON.stringify({});
+  const config: AxiosRequestConfig = {
+    method: "post",
+    url: "/application/v1/_fundsstat", // Local proxy path
+    headers: {
+      "Content-Type": "application/json",
+    },
+    data: data,
+  };
+
   try {
-    const response = await axios.get(`${apiDigitUrl}/_fundsstat`, payload);
+    const response = await axios(config);
     console.log(response.data);
-    return response?.data;
+    return response.data;
   } catch (error) {
-    console.log(error);
+    console.error("API request error:", error);
   }
 };
 
-//Popular benefitd digit API
 export const popularBenefitDigit = async () => {
-  const payload = {};
+  const data = JSON.stringify({});
+  const config: AxiosRequestConfig = {
+    method: "post",
+    url: "/application/v1/scholarships/top-3", // Local proxy path
+    headers: {
+      "Content-Type": "application/json",
+    },
+    data: data,
+  };
+
   try {
-    const response = await axios.get(
-      `${apiDigitUrl}/scholarships/top-3`,
-      payload
-    );
+    const response = await axios(config);
     console.log(response.data);
-    return response?.data;
+    return response.data;
   } catch (error) {
-    console.log(error);
+    console.error("API request error:", error);
   }
 };
 
-//Benefit summary digit API
 export const benefitSummaryDigit = async () => {
-  const payload = {};
+  const data = JSON.stringify({});
+  const config: AxiosRequestConfig = {
+    method: "post",
+    url: "/application/v1/scholarships/details", // Local proxy path
+    headers: {
+      "Content-Type": "application/json",
+    },
+    data: data,
+  };
+
   try {
-    const response = await axios.get(
-      `${apiDigitUrl}/scholarships/details`,
-      payload
-    );
+    const response = await axios(config);
     console.log(response.data);
-    return response?.data;
+    return response.data;
   } catch (error) {
-    console.log(error);
+    console.error("API request error:", error);
   }
 };
 

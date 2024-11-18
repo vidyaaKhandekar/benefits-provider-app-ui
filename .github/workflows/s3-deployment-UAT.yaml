@@ -18,7 +18,7 @@ jobs:
           if [ -f .env ]; then
           rm .env
           fi
-          echo '${{ secrets.UAT_ENV }}' > .env
+          echo '${{ secrets.DEV_ENV }}' > .env
           ls -ltra
           yarn install
           yarn build

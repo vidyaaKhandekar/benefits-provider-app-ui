@@ -41,3 +41,12 @@
 .read-the-docs {
   color: #888;
 }
+.react-datepicker__portal {
+  z-index: 111 !important;
+}
+.custom-btn {
+  padding: 24px 63px !important;
+  background-color: #3c5fdd !important;
+  color: #fff !important;
+  border-radius: 100px !important;
+}

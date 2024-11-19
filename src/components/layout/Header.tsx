@@ -1,10 +1,5 @@
 import React from "react";
-import {
-  AddIcon,
-  EditIcon,
-  SearchIcon,
-  ChevronDownIcon,
-} from "@chakra-ui/icons";
+import { SearchIcon, ChevronDownIcon } from "@chakra-ui/icons";
 import {
   Box,
   HStack,
@@ -52,22 +47,22 @@ const Header: React.FC<HeaderProps> = ({
     {
       label: "Dashboard",
       onClick: () => {
-        navigate("/");
+        navigate("/home");
       },
     },
-    {
-      label: "Quick Actions",
-      option: [
-        {
-          name: "Create",
-          icon: <AddIcon />,
-          onClick: () => {
-            navigate("/benefits/form");
-          },
-        },
-        { name: "Edit", icon: <EditIcon /> },
-      ],
-    },
+    // {
+    //   label: "Quick Actions",
+    //   option: [
+    //     {
+    //       name: "Create",
+    //       icon: <AddIcon />,
+    //       onClick: () => {
+    //         navigate("/benefits/form");
+    //       },
+    //     },
+    //     { name: "Edit", icon: <EditIcon /> },
+    //   ],
+    // },
     {
       label: "Log out",
       onClick: () => {

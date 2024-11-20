@@ -1,7 +1,6 @@
 import {
   ArrowForwardIcon,
   ChevronDownIcon,
-  EditIcon,
   SearchIcon,
 } from "@chakra-ui/icons";
 import {
@@ -70,7 +69,7 @@ const ActionCell = ({ rowData }: ICellTextProps) => {
   const navigate = useNavigate();
   return (
     <HStack>
-      <IconButton aria-label="Edit" icon={<EditIcon />} size="lg" />
+      <IconButton aria-label="Edit" icon={<ChevronDownIcon />} size="lg" />
       <IconButton
         onClick={() => {
           navigate(`/${rowData?.rowData?.id}/applicants_list`);

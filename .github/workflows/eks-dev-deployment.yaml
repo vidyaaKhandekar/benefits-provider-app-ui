@@ -1,4 +1,4 @@
-name: S3 Deployment on the Piramal-OU Tekdi
+name: DEV EKS DEPLOYMENT
 
 on: [push]
 
@@ -14,7 +14,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '20.17.0'
+          node-version: '20'
 
       # Install dependencies and build the project
       - name: npm install, build

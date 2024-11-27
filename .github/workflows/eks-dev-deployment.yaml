@@ -3,7 +3,7 @@ name: DEV EKS DEPLOYMENT
 on: [push]
 
 jobs:
-  build_and_test:
+  build_and_Deploy_EKS-DEV:
     runs-on: ubuntu-latest
     steps:
       # Checkout repository
@@ -52,8 +52,7 @@ jobs:
         run: |
           IMAGE_NAME=${{ secrets.DOCKER_REPO_NAME_DEV }}
           IMAGE_TAG=${{ secrets.DOCKER_IMAGE_DEV }}
-          docker build -t $IMAGE_NAME:$IMAGE_TAG .
-          docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:latest
+          cd dist/ || docker build -t $IMAGE_NAME:$IMAGE_TAG .
           docker push $IMAGE_NAME:$IMAGE_TAG
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}

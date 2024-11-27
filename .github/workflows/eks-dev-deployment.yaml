@@ -26,7 +26,7 @@ jobs:
           echo '${{ secrets.DEV_ENV }}' > .env
           ls -ltra
           yarn install
-          yarn build
+          yarn run build
           ls -ltra
 
       # Debugging steps (optional)

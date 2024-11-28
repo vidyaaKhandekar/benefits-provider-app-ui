@@ -43,7 +43,7 @@ jobs:
           echo "${{ secrets.DOCKER_FILE_CONTENT_DEV }}" > dist/Dockerfile
           echo "Dockerfile created:"
           cp -r nginx.conf dist/
-          cat Dockerfile
+          
 
       # Log in to Docker Hub
       - name: Log in to Docker Hub

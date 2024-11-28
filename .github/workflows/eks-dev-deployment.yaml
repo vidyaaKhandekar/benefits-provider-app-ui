@@ -18,35 +18,45 @@ jobs:
         with:
           node-version: '20'
 
-      # Install dependencies and build the project
-      - name: npm install, build
+            # Install dependencies and build the project
+      - name: Install dependencies and build
         run: |
           ls -ltra
           if [ -f .env ]; then
-          rm .env
+            rm .env
           fi
           echo '${{ secrets.DEV_ENV }}' > .env
           ls -ltra
           yarn install
           yarn run build
-          ls -ltra 
-          ls -ltra dist
-          ls -ltra /home/runner/work/benefits-provider-app-ui/benefits-provider-app-ui/dist
-          cp -r nginx.conf dist/
+          ls -ltra
 
-      # Debugging steps (optional)
-      - name: Show PWD
-        run: echo "Current Working Directory:" && pwd
-      - name: List Contents
-        run: ls -lr
+      # Ensure dist/ directory exists
+      - name: Verify dist/ directory
+        run: |
+          if [ ! -d dist ]; then
+            echo "dist/ directory not found. Creating it manually."
+            mkdir dist
+          fi
 
       # Create Dockerfile from secrets
-      - name: Create Dockerfile
+      - name: Create Dockerfile in dist/
         run: |
-          echo "${{ secrets.DOCKER_FILE_CONTENT_DEV }}" > Dockerfile
+          if [ -z "${{ secrets.DOCKER_FILE_CONTENT_DEV }}" ]; then
+            echo "Error: DOCKER_FILE_CONTENT_DEV secret is empty."
+            exit 1
+          fi
           echo "${{ secrets.DOCKER_FILE_CONTENT_DEV }}" > dist/Dockerfile
-          # ls -ltra /home/runner/work/benefits-provider-app-ui/benefits-provider-app-ui/dist
-          # cp -r nginx.conf dist/
+          echo "Dockerfile created in dist/:"
+          cat dist/Dockerfile
+          if [ -f nginx.conf ]; then
+            cp nginx.conf dist/
+            echo "nginx.conf copied to dist/"
+          else
+            echo "Error: nginx.conf not found in the repository."
+            exit 1
+          fi
+
           
       # Log in to Docker Hub
       - name: Log in to Docker Hub
@@ -58,7 +68,8 @@ jobs:
         run: |
           ########IMAGE_NAME=${{ secrets.DOCKER_REPO_NAME_DEV }}
           #######IMAGE_TAG=${{ secrets.DOCKER_IMAGE_DEV }}
-          cd dist/ && docker build -t ${{ secrets.DOCKER_REPO_NAME_DEV }}:${{ secrets.DOCKER_IMAGE_DEV }} .
+          cd dist/
+          docker build -t ${{ secrets.DOCKER_REPO_NAME_DEV }}:${{ secrets.DOCKER_IMAGE_DEV }} .
           docker push ${{ secrets.DOCKER_REPO_NAME_DEV }}:${{ secrets.DOCKER_IMAGE_DEV }}
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}

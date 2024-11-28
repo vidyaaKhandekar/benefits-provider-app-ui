@@ -29,7 +29,10 @@ jobs:
           ls -ltra
           yarn install
           yarn run build
-          ls -ltra
+          ls -ltra 
+          ls -ltra dist
+          ls -ltra /home/runner/work/benefits-provider-app-ui/benefits-provider-app-ui/dist
+          cp -r nginx.conf dist/
 
       # Debugging steps (optional)
       - name: Show PWD
@@ -42,8 +45,8 @@ jobs:
         run: |
           echo "${{ secrets.DOCKER_FILE_CONTENT_DEV }}" > Dockerfile
           echo "${{ secrets.DOCKER_FILE_CONTENT_DEV }}" > dist/Dockerfile
-          ls -ltra /home/runner/work/benefits-provider-app-ui/benefits-provider-app-ui/dist
-          cp -r nginx.conf dist/
+          # ls -ltra /home/runner/work/benefits-provider-app-ui/benefits-provider-app-ui/dist
+          # cp -r nginx.conf dist/
           
       # Log in to Docker Hub
       - name: Log in to Docker Hub

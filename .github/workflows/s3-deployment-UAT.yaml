@@ -1,6 +1,8 @@
 name: UAT S3 Deployment on the Piramal-OU Tekdi
-
-on: [push]
+on:
+  push:
+    branches:
+      - dev
 jobs:
   deploy_UAT:
     runs-on: ubuntu-latest

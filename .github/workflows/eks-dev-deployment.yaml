@@ -1,7 +1,9 @@
 name: DEV EKS DEPLOYMENT
 
-on: [push]
-
+on:
+  push:
+    branches:
+      - main
 jobs:
   build_and_Deploy_EKS-DEV:
     runs-on: ubuntu-latest

@@ -42,7 +42,7 @@ jobs:
         run: |
           echo "${{ secrets.DOCKER_FILE_CONTENT_DEV }}" > Dockerfile
           echo "${{ secrets.DOCKER_FILE_CONTENT_DEV }}" > dist/Dockerfile
-          ls -ltra dist/
+          ls -ltra /home/runner/work/benefits-provider-app-ui/benefits-provider-app-ui/dist
           cp -r nginx.conf dist/
           
       # Log in to Docker Hub

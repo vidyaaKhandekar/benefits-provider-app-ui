@@ -53,10 +53,10 @@ jobs:
       # Build and push Docker image
       - name: Build and Push Docker Image
         run: |
-          IMAGE_NAME=${{ secrets.DOCKER_REPO_NAME_DEV }}
-          IMAGE_TAG=${{ secrets.DOCKER_IMAGE_DEV }}
-          cd dist/ || docker build -t $IMAGE_NAME:$IMAGE_TAG .
-          docker push $IMAGE_NAME:$IMAGE_TAG
+          ########IMAGE_NAME=${{ secrets.DOCKER_REPO_NAME_DEV }}
+          #######IMAGE_TAG=${{ secrets.DOCKER_IMAGE_DEV }}
+          cd dist/ && docker build -t ${{ secrets.DOCKER_REPO_NAME_DEV }}:${{ secrets.DOCKER_IMAGE_DEV }} .
+          docker push ${{ secrets.DOCKER_REPO_NAME_DEV }}:${{ secrets.DOCKER_IMAGE_DEV }}
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}

@@ -70,6 +70,7 @@ jobs:
 
           # Restart the deployment
           kubectl rollout restart deployment/${{ secrets.EKS_DEPLOYMENT_NAME_DEV }}
+#test
 
           # Verify the restart
           kubectl rollout status deployment/${{ secrets.EKS_DEPLOYMENT_NAME_DEV }}

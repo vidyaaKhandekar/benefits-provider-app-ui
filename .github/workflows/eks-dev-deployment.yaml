@@ -82,9 +82,9 @@ jobs:
           export AWS_REGION=${{ secrets.AWS_REGION }}
           
           # Set kubectl configuration
-          aws eks update-kubeconfig --region $AWS_REGION --name ${{ secrets.EKS_CLUSTER_NAME_DEV }}
+          aws eks update-kubeconfig --region "${{ secrets.AWS_REGION }}" --name "${{ secrets.EKS_CLUSTER_NAME_DEV }}"
 
           # Restart the deployment
-          kubectl rollout restart deployment/${{ secrets.EKS_DEPLOYMENT_NAME_DEV }}
+          kubectl rollout restart deployment/${{ secrets.EKS_DEPLOYMENT_NAME_DEV }} -n egov
           # Verify the restart
-          kubectl rollout status deployment/${{ secrets.EKS_DEPLOYMENT_NAME_DEV }}
+          kubectl rollout status deployment/${{ secrets.EKS_DEPLOYMENT_NAME_DEV }} -n egov

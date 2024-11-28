@@ -30,7 +30,12 @@ jobs:
           yarn install
           yarn run build
           ls -ltra
-
+      - name: Ensure dist/ directory exists
+        run: |
+          if [ ! -d dist ]; then
+            echo "dist/ directory not found. Creating it."
+            mkdir -p dist
+          fi
       # Ensure dist/ directory exists
       - name: Verify dist/ directory
         run: |
@@ -39,16 +44,21 @@ jobs:
             mkdir dist
           fi
 
-      # Create Dockerfile from secrets
+            # Create Dockerfile in dist/
       - name: Create Dockerfile in dist/
         run: |
-          if [ -z "${{ secrets.DOCKER_FILE_CONTENT_DEV }}" ]; then
-            echo "Error: DOCKER_FILE_CONTENT_DEV secret is empty."
+          if [ -z "${{ secrets.DOCKERFILE_DEV }}" ]; then
+            echo "Error: DOCKERFILE_DEV secret is empty."
             exit 1
           fi
-          echo "${{ secrets.DOCKER_FILE_CONTENT_DEV }}" > dist/Dockerfile
+
+          # Write the Dockerfile content safely
+          echo "${{ secrets.DOCKERFILE_DEV }}" | sed 's/\r$//' > dist/Dockerfile
+
           echo "Dockerfile created in dist/:"
           cat dist/Dockerfile
+
+          # Copy nginx.conf if it exists
           if [ -f nginx.conf ]; then
             cp nginx.conf dist/
             echo "nginx.conf copied to dist/"
@@ -56,8 +66,6 @@ jobs:
             echo "Error: nginx.conf not found in the repository."
             exit 1
           fi
-
-          
       # Log in to Docker Hub
       - name: Log in to Docker Hub
         run: |
@@ -66,8 +74,6 @@ jobs:
       # Build and push Docker image
       - name: Build and Push Docker Image
         run: |
-          ########IMAGE_NAME=${{ secrets.DOCKER_REPO_NAME_DEV }}
-          #######IMAGE_TAG=${{ secrets.DOCKER_IMAGE_DEV }}
           cd dist/
           docker build -t ${{ secrets.DOCKER_REPO_NAME_DEV }}:${{ secrets.DOCKER_IMAGE_DEV }} .
           docker push ${{ secrets.DOCKER_REPO_NAME_DEV }}:${{ secrets.DOCKER_IMAGE_DEV }}

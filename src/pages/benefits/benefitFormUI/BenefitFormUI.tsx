@@ -41,20 +41,21 @@ const BenefitFormUI: React.FC = () => {
     const handleMessage = (event: MessageEvent) => {
       window.postMessage({ type: "FORM_SUBMIT", data: formData }, "*");
 
-      if (event.origin !== `${import.meta.env.VITE_DIGIT_BASE_URL}/uba-ui`) {
+      const url = import.meta.env.VITE_BENEFICIERY_IFRAME_URL;
+
+      if (event.origin !== url) {
         return;
       }
 
-      const receivedData = event.data;
-      setFormData(receivedData);
+      const { prefillData } = event.data;
+      setFormData(prefillData);
       const applicationSchemaData = preMatricScholarshipSC.en.applicationForm;
       const applicationFormSchema = convertApplicationFormFields(
         applicationSchemaData
       );
-
       const prop = applicationFormSchema?.properties;
       Object.keys(prop).forEach((item: string) => {
-        if (receivedData?.[item] && receivedData?.[item] !== "") {
+        if (prefillData?.[item] && prefillData?.[item] !== "") {
           prop[item] = {
             ...prop[item],
             readOnly: true,
@@ -63,7 +64,7 @@ const BenefitFormUI: React.FC = () => {
       });
       setApplicationSchema({ ...applicationFormSchema, properties: prop });
 
-      setUserDocs(event?.data?.docs);
+      setUserDocs(prefillData?.docs);
     };
 
     window.addEventListener("message", handleMessage);
@@ -100,7 +101,6 @@ const BenefitFormUI: React.FC = () => {
           required,
           properties,
         };
-
         setFormSchema(allSchema);
       }
     };

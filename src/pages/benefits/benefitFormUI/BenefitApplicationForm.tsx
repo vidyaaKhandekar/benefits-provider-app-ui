@@ -162,8 +162,9 @@ const BenefitApplicationForm: React.FC = () => {
       if (id) {
         try {
           const result = await getSchema(id);
+          
           if (
-            !result?.responses?.[0]?.message?.catalog?.providers?.[0]
+            !result?.message?.catalog?.providers?.[0]
               ?.items?.[0]
           ) {
             throw new Error("Invalid schema response structure");
@@ -171,18 +172,18 @@ const BenefitApplicationForm: React.FC = () => {
 
           // Extract relevant tags from the schema response
           const schemaTag =
-            result?.responses[0]?.message?.catalog?.providers?.[0]?.items?.[0]?.tags?.find(
+            result?.message?.catalog?.providers?.[0]?.items?.[0]?.tags?.find(
               (tag: any) => tag?.descriptor?.code === "applicationForm"
             );
 
           // Extract relevant tags from the schema response
           const documentTag =
-            result?.responses[0]?.message?.catalog?.providers?.[0]?.items?.[0]?.tags?.find(
+            result?.message?.catalog?.providers?.[0]?.items?.[0]?.tags?.find(
               (tag: any) => tag?.descriptor?.code === "required-docs"
             );
 
           const eligibilityTag =
-            result?.responses[0]?.message?.catalog?.providers?.[0]?.items?.[0]?.tags?.find(
+            result?.message?.catalog?.providers?.[0]?.items?.[0]?.tags?.find(
               (tag: any) => tag?.descriptor?.code === "eligibility"
             );
 
